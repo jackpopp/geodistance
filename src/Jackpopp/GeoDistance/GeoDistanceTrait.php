@@ -1,6 +1,7 @@
 <?php namespace Jackpopp\GeoDistance;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
+use InvalidMesurementException;
 
 trait GeoDistanceTrait {
 
@@ -10,9 +11,12 @@ trait GeoDistanceTrait {
 
     protected $distance = 10;
 
-    private static $MILES = 3959;
-
-    private $KM = 6371;
+    private static $MESUREMENTS = [
+        'miles' => 3959, 
+        'm' => 3959, 
+        'kilometers' => 6371, 
+        'km' => 6371
+    ];
 
     protected $yards = 3959;
 
@@ -59,6 +63,27 @@ trait GeoDistanceTrait {
         return $this->lng;
     }
 
+    public function resolveYards($measurement)
+    {
+        if (array_key_exists($measurement, static::$MESUREMENTS))
+            return static::$MESUREMENTS[$measurement];
+
+        throw new InvalidMesurementException('Invalid measurement');
+    }
+
+    /**
+    * @param Query 
+    * @param integer
+    * @param mixed
+    * @param mixed
+    *
+    * @return Query
+    *
+    * Implements a distance radius search using Haversine formula.
+    * Returns a query scope.
+    * credit - https://developers.google.com/maps/articles/phpsqlsearch_v3
+    **/
+
     public function scopeWithin($q, $distance, $measurement, $lat = null, $lng = null)
     {
         $pdo = Capsule::connection()->getPdo();
@@ -70,7 +95,9 @@ trait GeoDistanceTrait {
         $lng = $pdo->quote(floatval($lng));
         $distance = intval($distance);
 
-        return $q->select(Capsule::raw("*, ( {$this->getYards()} * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
+        $yards = $this->resolveYards($measurement);
+
+        return $q->select(Capsule::raw("*, ( $yards * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->having('distance', '<', $distance)
             ->orderby('distance', 'ASC');
     }       

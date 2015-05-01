@@ -44,3 +44,6 @@ $location = $location->lat($lat)->lng($lng)->within(20, 'miles')->get();
 
 $locations = Location::within(20, 'miles', $lat, $lng)->get();
 $I->assertEquals(1, $locations->count(), 'One location found within 20 miles');
+
+$locations = Location::within(20, 'kilometers', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'One location found within 20 kilometers');
