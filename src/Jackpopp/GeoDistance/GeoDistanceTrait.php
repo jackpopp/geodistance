@@ -1,7 +1,7 @@
 <?php namespace Jackpopp\GeoDistance;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
-use InvalidMesurementException;
+use Jackpopp\GeoDistance\InvalidMesurementException;
 
 trait GeoDistanceTrait {
 
@@ -63,8 +63,10 @@ trait GeoDistanceTrait {
         return $this->lng;
     }
 
-    public function resolveYards($measurement)
+    public function resolveYards($measurement = null)
     {
+        $measurement = ($measurement === null) ? key(static::$MESUREMENTS) : $measurement; 
+
         if (array_key_exists($measurement, static::$MESUREMENTS))
             return static::$MESUREMENTS[$measurement];
 
@@ -84,7 +86,7 @@ trait GeoDistanceTrait {
     * credit - https://developers.google.com/maps/articles/phpsqlsearch_v3
     **/
 
-    public function scopeWithin($q, $distance, $measurement, $lat = null, $lng = null)
+    public function scopeWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
         $pdo = Capsule::connection()->getPdo();
 

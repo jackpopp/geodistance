@@ -32,18 +32,26 @@ class Location extends Model {
 }
 
 $I = new UnitTester($scenario);
-$I->wantTo('find locations within 20 miles');
 
-$lat = 51.4815;
-$lng = -3.1790;
+$lat = 51.4833;
+$lng = 3.1833;
 
 $location = new Location();
 $location = $location->lat($lat)->lng($lng)->within(20, 'miles')->get();
 
-//$locations = Location::lat(51.4815)->lng(-3.1790)->within(20, 'miles')->get();
+$I->wantTo('find locations within 5 miles');
+$locations = Location::within(5, 'miles', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'One location found within 1 miles');
 
-$locations = Location::within(20, 'miles', $lat, $lng)->get();
+$I->wantTo('find locations within 55 miles');
+$locations = Location::within(55, 'miles', $lat, $lng)->get();
+$I->assertEquals(3, $locations->count(), 'Three locations found within 55 miles');
+
+$I->wantTo('find locations within 5 kilometers');
+$locations = Location::within(5, 'kilometers', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'One location found within 5 kilometers');
+
+$I->wantTo('default to first mesurement if no paramater is passed');
+$location = new Location();
+$location = $location->lat($lat)->lng($lng)->within(20)->get();
 $I->assertEquals(1, $locations->count(), 'One location found within 20 miles');
-
-$locations = Location::within(20, 'kilometers', $lat, $lng)->get();
-$I->assertEquals(1, $locations->count(), 'One location found within 20 kilometers');
