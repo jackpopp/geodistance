@@ -1,0 +1,25 @@
+{
+    "name": "jackpopp/geodistance",
+    "authors": [
+        {
+            "name": "Jack Hannigan Popp",
+            "email": "jack@jackpopp.com"
+        }
+    ],
+    "require": {
+        "illuminate/database": "*"
+    },
+    "require-dev": {
+        "illuminate/database": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "src\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jackpopp\\GeoDistance\\": "src/"
+        }
+    }
+}
