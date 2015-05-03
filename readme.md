@@ -39,6 +39,6 @@ $locations = Location::within(5, 'kilometers', $lat, $lng)->get();
 // or 
 
 $location = new Location();
-$locations = $location->lat($lat)->lng($lng)->with(5, 'miles')->get();
+$locations = $location->lat($lat)->lng($lng)->within(5, 'miles')->get();
 
 ```
