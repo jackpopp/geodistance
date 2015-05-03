@@ -37,7 +37,7 @@ $lat = 51.4833;
 $lng = 3.1833;
 
 $location = new Location();
-$location = $location->lat($lat)->lng($lng)->within(20, 'miles')->get();
+$locations = $location->lat($lat)->lng($lng)->within(20, 'miles')->get();
 
 $I->wantTo('find locations within 5 miles');
 $locations = Location::within(5, 'miles', $lat, $lng)->get();

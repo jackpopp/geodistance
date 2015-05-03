@@ -93,6 +93,9 @@ trait GeoDistanceTrait {
         $latColumn = "{$this->getTable()}.{$this->getLatColumn()}";
         $lngColumn = "{$this->getTable()}.{$this->getLngColumn()}";
 
+        $lat = ($lat === null) ? $this->lat() : $lat;
+        $lng = ($lng === null) ? $this->lng() : $lng;
+ 
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
         $distance = intval($distance);

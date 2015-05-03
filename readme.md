@@ -10,7 +10,7 @@ Add geodistance to your composer file.
 
 Add the geodistance trait to your eloquent model and lat/lng columns to your table.
 
-```
+```php
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -27,8 +27,18 @@ class Location extends Model {
 
 You can now search for locations with in a distance, using miles or kilometers
 
-```
+```php
+
+$lat = 51.4833;
+$lng = 3.1833;
+
 $locations = Location::within(5, 'miles', $lat, $lng)->get();
 
 $locations = Location::within(5, 'kilometers', $lat, $lng)->get();
+
+// or 
+
+$location = new Location();
+$locations = $location->lat($lat)->lng($lng)->with(5, 'miles')->get();
+
 ```
