@@ -14,12 +14,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Jackpopp\\GeoDistance\\": "src/"
+            "Jackpopp\\GeoDistance\\": "src/Jackpopp/GeoDistance"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Jackpopp\\GeoDistance\\": "src/"
+            "Jackpopp\\GeoDistance\\": "src/Jackpopp/GeoDistance"
         }
     }
 }
