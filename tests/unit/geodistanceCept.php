@@ -23,6 +23,21 @@ $capsule->addConnection(array(
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
+// add a helper DB class to simulate the DB facade in laravel
+class DB {
+
+    static function connection()
+    {
+        return Capsule::connection();
+    }
+
+    static function raw($string)
+    {
+        return Capsule::raw($string);
+    }
+
+}
+
 class Location extends Model {
 
     use GeoDistanceTrait;

@@ -1,6 +1,6 @@
 <?php namespace Jackpopp\GeoDistance;
 
-use Illuminate\Database\Capsule\Manager as Capsule;
+use DB;
 use Jackpopp\GeoDistance\InvalidMesurementException;
 
 trait GeoDistanceTrait {
@@ -88,7 +88,7 @@ trait GeoDistanceTrait {
 
     public function scopeWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
-        $pdo = Capsule::connection()->getPdo();
+        $pdo = DB::connection()->getPdo();
 
         $latColumn = "{$this->getTable()}.{$this->getLatColumn()}";
         $lngColumn = "{$this->getTable()}.{$this->getLngColumn()}";
@@ -102,7 +102,7 @@ trait GeoDistanceTrait {
 
         $yards = $this->resolveYards($measurement);
 
-        return $q->select(Capsule::raw("*, ( $yards * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
+        return $q->select(DB::raw("*, ( $yards * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->having('distance', '<', $distance)
             ->orderby('distance', 'ASC');
     }       
