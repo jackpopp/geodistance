@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "src\\": "src/"
+            "Jackpopp\\GeoDistance\\": "src/"
         }
     },
     "autoload-dev": {
