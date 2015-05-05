@@ -1,7 +1,7 @@
 <?php namespace Jackpopp\GeoDistance;
 
 use DB;
-use Jackpopp\GeoDistance\InvalidMesurementException;
+use Jackpopp\GeoDistance\InvalidMeasurementException;
 
 trait GeoDistanceTrait {
 
@@ -11,10 +11,10 @@ trait GeoDistanceTrait {
 
     protected $distance = 10;
 
-    private static $MESUREMENTS = [
-        'miles' => 3959, 
-        'm' => 3959, 
-        'kilometers' => 6371, 
+    private static $MEASUREMENTS = [
+        'miles' => 3959,
+        'm' => 3959,
+        'kilometers' => 6371,
         'km' => 6371
     ];
 
@@ -65,16 +65,16 @@ trait GeoDistanceTrait {
 
     public function resolveYards($measurement = null)
     {
-        $measurement = ($measurement === null) ? key(static::$MESUREMENTS) : $measurement; 
+        $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : $measurement;
 
-        if (array_key_exists($measurement, static::$MESUREMENTS))
-            return static::$MESUREMENTS[$measurement];
+        if (array_key_exists($measurement, static::$MEASUREMENTS))
+            return static::$MEASUREMENTS[$measurement];
 
-        throw new InvalidMesurementException('Invalid measurement');
+        throw new InvalidMeasurementException('Invalid measurement');
     }
 
     /**
-    * @param Query 
+    * @param Query
     * @param integer
     * @param mixed
     * @param mixed
@@ -95,7 +95,7 @@ trait GeoDistanceTrait {
 
         $lat = ($lat === null) ? $this->lat() : $lat;
         $lng = ($lng === null) ? $this->lng() : $lng;
- 
+
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
         $distance = intval($distance);
@@ -105,6 +105,6 @@ trait GeoDistanceTrait {
         return $q->select(DB::raw("*, ( $yards * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->having('distance', '<', $distance)
             ->orderby('distance', 'ASC');
-    }       
+    }
 
 }
