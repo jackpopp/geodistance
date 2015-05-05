@@ -11,7 +11,7 @@ trait GeoDistanceTrait {
 
     protected $distance = 10;
 
-    private static $MESUREMENTS = [
+    private static $MEASUREMENTS = [
         'miles' => 3959, 
         'm' => 3959, 
         'kilometers' => 6371, 
@@ -43,32 +43,28 @@ trait GeoDistanceTrait {
 
     public function lat($lat = null)
     {
-        if ($lat)
-        {
-            $this->lat = $lat;
-            return $this;
-        }
+        if (is_null($lat))
+            return $this->lat;
 
-        return $this->lat;
+        $this->lat = $lat;
+        return $this;
     }
 
     public function lng($lng = null)
     {
-        if ($lng)
-        {
-            $this->lng = $lng;
-            return $this;
-        }
+        if (is_null($lng))
+            return $this->lng;
 
-        return $this->lng;
+        $this->lng = $lng;
+        return $this;
     }
 
     public function resolveYards($measurement = null)
     {
-        $measurement = ($measurement === null) ? key(static::$MESUREMENTS) : $measurement; 
+        $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : $measurement; 
 
-        if (array_key_exists($measurement, static::$MESUREMENTS))
-            return static::$MESUREMENTS[$measurement];
+        if (array_key_exists($measurement, static::$MEASUREMENTS))
+            return static::$MEASUREMENTS[$measurement];
 
         throw new InvalidMesurementException('Invalid measurement');
     }
