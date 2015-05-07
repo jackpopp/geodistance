@@ -42,3 +42,12 @@ $location = new Location();
 $locations = $location->lat($lat)->lng($lng)->within(5, 'miles')->get();
 
 ```
+
+Distances Available
+
+Miles (miles/m)
+Kilometers (kilometers/km)
+Nautical Miles (mautical_miles)
+Feet (feet)
+
+If you wish to add addtional measurements, please create a new issue.

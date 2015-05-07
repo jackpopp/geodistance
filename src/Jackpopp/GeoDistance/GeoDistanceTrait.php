@@ -15,7 +15,10 @@ trait GeoDistanceTrait {
         'miles' => 3959,
         'm' => 3959,
         'kilometers' => 6371,
-        'km' => 6371
+        'km' => 6371,
+        'meters' => 6371000,
+        'feet' => 20902231,
+        'nautical_miles' => 3440.06479
     ];
 
     protected $yards = 3959;
@@ -65,7 +68,7 @@ trait GeoDistanceTrait {
 
     public function resolveYards($measurement = null)
     {
-        $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : $measurement;
+        $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : strtolower($measurement);
 
         if (array_key_exists($measurement, static::$MEASUREMENTS))
             return static::$MEASUREMENTS[$measurement];

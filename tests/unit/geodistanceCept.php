@@ -46,6 +46,11 @@ class Location extends Model {
     
 }
 
+/*for ($i = 0; $i < 1000; $i++)
+{
+    Location::create(['location' => $i, 'lat' => $i, 'lng' => $i, 'updated_at' => $i, 'created_at' => $i]);
+}*/
+
 $I = new UnitTester($scenario);
 
 $lat = 51.4833;
@@ -58,6 +63,10 @@ $I->wantTo('find locations within 5 miles');
 $locations = Location::within(5, 'miles', $lat, $lng)->get();
 $I->assertEquals(1, $locations->count(), 'One location found within 1 miles');
 
+$I->wantTo('find 2 locations within 132000 feet (25 miles)');
+$locations = Location::within(132000, 'feet', $lat, $lng)->get();
+$I->assertEquals(2, $locations->count(), 'One location found within 132000 feet');
+
 $I->wantTo('find locations within 55 miles');
 $locations = Location::within(55, 'miles', $lat, $lng)->get();
 $I->assertEquals(3, $locations->count(), 'Three locations found within 55 miles');
@@ -65,6 +74,14 @@ $I->assertEquals(3, $locations->count(), 'Three locations found within 55 miles'
 $I->wantTo('find locations within 5 kilometers');
 $locations = Location::within(5, 'kilometers', $lat, $lng)->get();
 $I->assertEquals(1, $locations->count(), 'One location found within 5 kilometers');
+
+$I->wantTo('find locations within 5 nautical miles');
+$locations = Location::within(5, 'nautical_miles', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'One location found within 5 nautical miles');
+
+$I->wantTo('find locations within 5000 meters');
+$locations = Location::within(5000, 'meters', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'One location found within 5000 meters');
 
 $I->wantTo('default to first mesurement if no paramater is passed');
 $location = new Location();
