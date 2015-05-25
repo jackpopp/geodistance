@@ -43,8 +43,36 @@ class Location extends Model {
     use GeoDistanceTrait;
 
     protected $fillable = ['name', 'lat', 'lng'];
+
+    public $timestamps = false;
     
 }
+
+Capsule::table('locations')->truncate();
+
+Location::create([
+    'name' => 'Cardiff', 
+    'lat' => 51.4833, 
+    'lng' => 3.1833
+]);
+
+Location::create([
+    'name' => 'Newport', 
+    'lat' => 51.5833, 
+    'lng' => 3.0000
+]);
+
+Location::create([
+    'name' => 'Swansea', 
+    'lat' => 51.6167, 
+    'lng' => 3.9500
+]);
+
+Location::create([
+    'name' => 'London', 
+    'lat' => 51.5072, 
+    'lng' => 0.1275
+]);
 
 /*for ($i = 0; $i < 1000; $i++)
 {

@@ -21,8 +21,6 @@ trait GeoDistanceTrait {
         'nautical_miles' => 3440.06479
     ];
 
-    protected $yards = 3959;
-
     public function getLatColumn()
     {
         return $this->latColumn;
@@ -31,17 +29,6 @@ trait GeoDistanceTrait {
     public function getLngColumn()
     {
         return $this->lngColumn;
-    }
-
-    public function getYards()
-    {
-        return $this->yards;
-    }
-
-    public function setYards($yards)
-    {
-        $this->yards = $yards;
-        return $this;
     }
 
     public function lat($lat = null)
@@ -66,7 +53,7 @@ trait GeoDistanceTrait {
         return $this->lng;
     }
 
-    public function resolveYards($measurement = null)
+    public function resolveEarthMeanRadius($measurement = null)
     {
         $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : strtolower($measurement);
 
@@ -99,14 +86,29 @@ trait GeoDistanceTrait {
         $lat = ($lat === null) ? $this->lat() : $lat;
         $lng = ($lng === null) ? $this->lng() : $lng;
 
-        $lat = $pdo->quote(floatval($lat));
-        $lng = $pdo->quote(floatval($lng));
+        $meanRadius = $this->resolveEarthMeanRadius($measurement);
         $distance = intval($distance);
 
-        $yards = $this->resolveYards($measurement);
+        // first-cut bounding box (in degrees)
+        $maxLat = floatval($lat) + rad2deg($distance/$meanRadius);
+        $minLat = floatval($lat) - rad2deg($distance/$meanRadius);
+        // compensate for degrees longitude getting smaller with increasing latitude
+        $maxLng = floatval($lng) + rad2deg($distance/$meanRadius/cos(deg2rad(floatval($lat))));
+        $minLng = floatval($lng) - rad2deg($distance/$meanRadius/cos(deg2rad(floatval($lat))));
 
-        return $q->select(DB::raw("*, ( $yards * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
-            ->having('distance', '<', $distance)
+        $lat = $pdo->quote(floatval($lat));
+        $lng = $pdo->quote(floatval($lng));
+
+        return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
+            ->from(DB::raw(
+                "(
+                    Select *
+                    From locations
+                    Where lat Between $minLat And $maxLat
+                    And lng Between $minLng And $maxLng
+                ) As locations"
+            ))
+            ->where(DB::raw("acos(sin($lat)*sin(radians(lat)) + cos($lng)*cos(radians(lat))*cos(radians(lng)-$lng)) * $distance < $lat"))
             ->orderby('distance', 'ASC');
     }
 
