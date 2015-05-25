@@ -23,12 +23,12 @@ trait GeoDistanceTrait {
 
     public function getLatColumn()
     {
-        return $this->latColumn;
+        return "{$this->getTable()}.{$this->latColumn}";
     }
 
     public function getLngColumn()
     {
-        return $this->lngColumn;
+        return "{$this->getTable()}.{$this->lngColumn}";
     }
 
     public function lat($lat = null)
@@ -81,8 +81,8 @@ trait GeoDistanceTrait {
     {
         $pdo = DB::connection()->getPdo();
 
-        $latColumn = "{$this->getTable()}.{$this->getLatColumn()}";
-        $lngColumn = "{$this->getTable()}.{$this->getLngColumn()}";
+        $latColumn = $this->getLatColumn();
+        $lngColumn = $this->getLngColumn();
 
         $lat = ($lat === null) ? $this->lat() : $lat;
         $lng = ($lng === null) ? $this->lng() : $lng;
@@ -99,7 +99,6 @@ trait GeoDistanceTrait {
 
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
-        $distance = $pdo->quote($distance);
         $meanRadius = $pdo->quote(floatval($meanRadius));
 
         return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
@@ -113,6 +112,30 @@ trait GeoDistanceTrait {
             ))
             ->where(DB::raw("acos(sin($lat)*sin(radians(lat)) + cos($lng)*cos(radians(lat))*cos(radians(lng)-$lng)) * $distance < $lat"))
             ->orderby('distance', 'ASC');
+    }
+
+    public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)
+    {
+        $pdo = DB::connection()->getPdo();
+
+        $latColumn = $this->getLatColumn();
+        $lngColumn = $this->getLngColumn();
+
+        $lat = ($lat === null) ? $this->lat() : $lat;
+        $lng = ($lng === null) ? $this->lng() : $lng;
+
+        $meanRadius = $this->resolveEarthMeanRadius($measurement);
+        $distance = intval($distance);
+
+        $lat = $pdo->quote(floatval($lat));
+        $lng = $pdo->quote(floatval($lng));
+        $meanRadius = $pdo->quote(floatval($meanRadius));
+
+        var_dump($distance);
+
+        return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
+        ->having('distance', '>=', $distance)
+        ->orderby('distance', 'ASC');
     }
 
 }

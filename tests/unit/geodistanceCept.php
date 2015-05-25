@@ -89,7 +89,7 @@ $locations = $location->lat($lat)->lng($lng)->within(20, 'miles')->get();
 
 $I->wantTo('find locations within 5 miles');
 $locations = Location::within(5, 'miles', $lat, $lng)->get();
-$I->assertEquals(1, $locations->count(), 'One location found within 1 miles');
+$I->assertEquals(1, $locations->count(), 'One location found within 5 miles');
 
 $I->wantTo('find 2 locations within 132000 feet (25 miles)');
 $locations = Location::within(132000, 'feet', $lat, $lng)->get();
@@ -115,3 +115,16 @@ $I->wantTo('default to first mesurement if no paramater is passed');
 $location = new Location();
 $location = $location->lat($lat)->lng($lng)->within(20)->get();
 $I->assertEquals(1, $locations->count(), 'One location found within 20 miles');
+
+$I->wantTo('find  3 locations not within 1 mile');
+$locations = Location::outside(1, 'miles', $lat, $lng)->get();
+$I->assertEquals(3, $locations->count(), 'Three location found not within 1 miles');
+
+$I->wantTo('find 1 locations not within 100 miles');
+$locations = Location::outside(100, 'miles', $lat, $lng)->get();
+$I->assertEquals(1, $locations->count(), 'Three location found not within 100 miles');
+
+$I->wantTo('find 0 locations not within 200 miles');
+$locations = Location::outside(200, 'miles', $lat, $lng)->get();
+$I->assertEquals(0, $locations->count(), 'Three location found not within 200 miles');
+
