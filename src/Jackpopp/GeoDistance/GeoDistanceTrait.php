@@ -69,6 +69,7 @@ trait GeoDistanceTrait {
     * @param mixed
     * @param mixed
     *
+    * @todo Use pdo paramater bindings, instead of direct variables in query
     * @return Query
     *
     * Implements a distance radius search using Haversine formula.
@@ -98,6 +99,8 @@ trait GeoDistanceTrait {
 
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
+        $distance = $pdo->quote($distance);
+        $meanRadius = $pdo->quote(floatval($meanRadius));
 
         return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->from(DB::raw(
