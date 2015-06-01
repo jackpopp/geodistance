@@ -53,6 +53,16 @@ trait GeoDistanceTrait {
         return $this->lng;
     }
 
+    /**
+    * @param string
+    *
+    * Grabs the earths mean radius in a specific measurment based on the key provided, throws an exception
+    * if no mean readius measurement is found
+    * 
+    * @throws InvalidMeasurementException
+    * @return float
+    **/
+
     public function resolveEarthMeanRadius($measurement = null)
     {
         $measurement = ($measurement === null) ? key(static::$MEASUREMENTS) : strtolower($measurement);
@@ -101,6 +111,9 @@ trait GeoDistanceTrait {
         $lng = $pdo->quote(floatval($lng));
         $meanRadius = $pdo->quote(floatval($meanRadius));
 
+        // Paramater bindings havent been used as it would need to be within a DB::select which would run straight away and return its result, which we dont want as it will break the query builder.
+        // This method should work okay as our values have been cooerced into correct types and quoted with pdo.
+
         return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->from(DB::raw(
                 "(
@@ -130,8 +143,6 @@ trait GeoDistanceTrait {
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
         $meanRadius = $pdo->quote(floatval($meanRadius));
-
-        var_dump($distance);
 
         return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
         ->having('distance', '>=', $distance)

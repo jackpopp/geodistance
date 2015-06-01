@@ -36,6 +36,11 @@ class DB {
         return Capsule::raw($string);
     }
 
+    static function select($query, $bindings = array(), $useReadPdo = true)
+    {
+        return static::connection()->select($query, $bindings = array(), $useReadPdo = true);
+    }
+
 }
 
 class Location extends Model {
