@@ -118,12 +118,12 @@ trait GeoDistanceTrait {
             ->from(DB::raw(
                 "(
                     Select *
-                    From locations
+                    From {$this->getTable()}
                     Where lat Between $minLat And $maxLat
                     And lng Between $minLng And $maxLng
                 ) As locations"
             ))
-            ->where(DB::raw("acos(sin($lat)*sin(radians(lat)) + cos($lng)*cos(radians(lat))*cos(radians(lng)-$lng)) * $distance < $lat"))
+            ->having('distance', '<=', $distance)
             ->orderby('distance', 'ASC');
     }
 
