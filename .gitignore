@@ -1,3 +1,7 @@
 vendor
 codecept.phar
 composer.lock
+
+tests/unit/UnitTester.php
+tests/functional/FunctionalTester.php
+tests/acceptance/AcceptanceTester.php
