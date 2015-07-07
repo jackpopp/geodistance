@@ -119,8 +119,8 @@ trait GeoDistanceTrait {
                 "(
                     Select *
                     From {$this->getTable()}
-                    Where {$latColumn} Between $minLat And $maxLat
-                    And {$lngColumn} Between $minLng And $maxLng
+                    Where $latColumn Between $minLat And $maxLat
+                    And $lngColumn Between $minLng And $maxLng
                 ) As {$this->getTable()}"
             ))
             ->having('distance', '<=', $distance)
