@@ -98,7 +98,7 @@ trait GeoDistanceTrait {
         $lng = ($lng === null) ? $this->lng() : $lng;
 
         $meanRadius = $this->resolveEarthMeanRadius($measurement);
-        $distance = intval($distance);
+        $distance = floatval($distance);
 
         // first-cut bounding box (in degrees)
         $maxLat = floatval($lat) + rad2deg($distance/$meanRadius);
@@ -138,7 +138,7 @@ trait GeoDistanceTrait {
         $lng = ($lng === null) ? $this->lng() : $lng;
 
         $meanRadius = $this->resolveEarthMeanRadius($measurement);
-        $distance = intval($distance);
+        $distance = floatval($distance);
 
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
