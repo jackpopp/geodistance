@@ -150,9 +150,8 @@ trait GeoDistanceTrait {
         $lng = $pdo->quote(floatval($lng));
         $meanRadius = $pdo->quote(floatval($meanRadius));
 
-        return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
-        ->having('distance', '>=', $distance)
-        ->orderby('distance', 'ASC');
+        $adapter = $this->resolveQueryAdapter(DB::connection()->getDriverName());
+        return $adapter->within($q, $meanRadius, $lat, $lng);
     }
 
     public function resolveQueryAdapter($connectionType)
@@ -164,7 +163,7 @@ trait GeoDistanceTrait {
             $class =  $this->buildFullyQualifiedClassString();
         }
 
-        return new $class($this->getTable(), $this->getLatColumn(), $this->getLngColumn(), $this->distance);
+        return new $class($this, $this->getTable(), $this->getLatColumn(), $this->getLngColumn(), $this->distance);
     }
 
     private function buildFullyQualifiedClassString($connectionType = '')

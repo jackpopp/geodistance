@@ -5,6 +5,7 @@
 */
 abstract class AbstractQueryAdapter
 {
+	protected $model;
 
 	protected $table;
 
@@ -14,12 +15,18 @@ abstract class AbstractQueryAdapter
 
 	protected $distance;
 
-	public function __construct($table, $latColumn, $lngColumn, $distance)
+	public function __construct($model, $table, $latColumn, $lngColumn, $distance)
 	{
+		$this->model = $model;
 		$this->table = $table;
 		$this->latColumn = $latColumn;
 		$this->lngColumn = $lngColumn;
 		$this->distance = $distance;
+	}
+
+	public function getModel()
+	{
+		return $this->model;
 	}
 
 	public function getDistance()

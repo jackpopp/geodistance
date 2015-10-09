@@ -29,8 +29,8 @@ class QueryAdapterTest extends \Codeception\TestCase\Test
     protected function _before()
     {
         $this->testClass = new TestClass;
-        $this->queryAdapter = new QueryAdapter(null, null, null, null);
-        $this->pgsqlQueryAdapter = new pgsqlQueryAdapter(null, null, null, null);
+        $this->queryAdapter = new QueryAdapter(null, null, null, null, null);
+        $this->pgsqlQueryAdapter = new pgsqlQueryAdapter(null, null, null, null, null);
     }
 
     protected function _after()

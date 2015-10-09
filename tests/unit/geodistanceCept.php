@@ -10,9 +10,9 @@ use Jackpopp\GeoDistance\GeoDistanceTrait;
 $capsule = new Capsule;
 
 $capsule->addConnection(array(
-    'driver'    => 'mysql',
+    'driver'    => 'pgsql',
     'host'      => 'localhost',
-    'database'  => 'geodistance',
+    'database'  => 'postgres',
     'username'  => 'homestead',
     'password'  => 'secret',
     'charset'   => 'utf8',
