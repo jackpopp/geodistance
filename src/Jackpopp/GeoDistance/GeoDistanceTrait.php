@@ -117,8 +117,10 @@ trait GeoDistanceTrait {
 
         // Paramater bindings havent been used as it would need to be within a DB::select which would run straight away and return its result, which we dont want as it will break the query builder.
         // This method should work okay as our values have been cooerced into correct types and quoted with pdo.
+        $adapter = $this->resolveQueryAdapter(DB::connection()->getDriverName());
+        return $adapter->within($q, $meanRadius, $lat, $lng, $minLat, $minLng, $maxLat, $maxLng);
 
-        return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
+        /*return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
             ->from(DB::raw(
                 "(
                     Select *
@@ -128,7 +130,7 @@ trait GeoDistanceTrait {
                 ) As {$this->getTable()}"
             ))
             ->having('distance', '<=', $this->distance)
-            ->orderby('distance', 'ASC');
+            ->orderby('distance', 'ASC');*/
     }
 
     public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)

@@ -22,14 +22,29 @@ abstract class AbstractQueryAdapter
 		$this->distance = $distance;
 	}
 
-	public function getDistance($distance)
+	public function getDistance()
 	{
-		return floatval($this->$distance);
+		return floatval($this->distance);
+	}
+
+	public function getTable()
+	{
+		return $this->table;
+	}
+
+	public function getLatColumn()
+	{
+		return $this->latColumn;
+	}
+
+	public function getLngColumn()
+	{
+		return $this->lngColumn;
 	}
 
 	 // mean radius, lat, lng, max lat, max lng
-	abstract public function within(Builder $query);
+	abstract public function within($query, $meanRadius, $lat, $lng, $minLat, $minLng, $maxLat, $maxLng);
 
 	// query, radius
-	abstract public function outside(Builder $query);
+	abstract public function outside($query, $meanRadius, $lat, $lng, $minLat, $minLng, $maxLat, $maxLng);
 }
