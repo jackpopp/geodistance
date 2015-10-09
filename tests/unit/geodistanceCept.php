@@ -20,6 +20,17 @@ $capsule->addConnection(array(
     'prefix'    => ''
 ));
 
+/*$capsule->addConnection(array(
+    'driver'    => 'mysql',
+    'host'      => 'localhost',
+    'database'  => 'geodistance',
+    'username'  => 'homestead',
+    'password'  => 'secret',
+    'charset'   => 'utf8',
+    'collation' => 'utf8_general_ci',
+    'prefix'    => ''
+));*/
+
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
@@ -127,6 +138,8 @@ $I->assertEquals(3, $locations->count(), 'Three location found not within 1 mile
 
 $I->wantTo('find 1 locations not within 100 miles');
 $locations = Location::outside(100, 'miles', $lat, $lng)->get();
+//var_dump($locations->toArray());
+//die();
 $I->assertEquals(1, $locations->count(), 'Three location found not within 100 miles');
 
 $I->wantTo('find 0 locations not within 200 miles');

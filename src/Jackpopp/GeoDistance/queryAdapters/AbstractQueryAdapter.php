@@ -53,5 +53,5 @@ abstract class AbstractQueryAdapter
 	abstract public function within($query, $meanRadius, $lat, $lng, $minLat, $minLng, $maxLat, $maxLng);
 
 	// query, radius
-	abstract public function outside($query, $meanRadius, $lat, $lng, $minLat, $minLng, $maxLat, $maxLng);
+	abstract public function outside($query, $meanRadius, $lat, $lng);
 }

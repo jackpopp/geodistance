@@ -93,6 +93,7 @@ trait GeoDistanceTrait {
 
     public function scopeWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
+        $this->distance = $distance;
         $pdo = DB::connection()->getPdo();
 
         $latColumn = $this->getLatColumn();
@@ -102,7 +103,6 @@ trait GeoDistanceTrait {
         $lng = ($lng === null) ? $this->lng() : $lng;
 
         $meanRadius = $this->resolveEarthMeanRadius($measurement);
-        $this->distance = $distance;
 
         // first-cut bounding box (in degrees)
         $maxLat = floatval($lat) + rad2deg($this->distance/$meanRadius);
@@ -135,6 +135,7 @@ trait GeoDistanceTrait {
 
     public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
+        $this->distance = $distance;
         $pdo = DB::connection()->getPdo();
 
         $latColumn = $this->getLatColumn();
@@ -151,7 +152,7 @@ trait GeoDistanceTrait {
         $meanRadius = $pdo->quote(floatval($meanRadius));
 
         $adapter = $this->resolveQueryAdapter(DB::connection()->getDriverName());
-        return $adapter->within($q, $meanRadius, $lat, $lng);
+        return $adapter->outside($q, $meanRadius, $lat, $lng);
     }
 
     public function resolveQueryAdapter($connectionType)
