@@ -4,7 +4,7 @@
 class GeodistanceTest extends \Codeception\TestCase\Test
 {
     /**
-     * @var \UnitTester
+     * @var \FunctionalTester
      */
     protected $tester;
 

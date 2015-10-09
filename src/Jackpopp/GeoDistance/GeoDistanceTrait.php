@@ -21,6 +21,10 @@ trait GeoDistanceTrait {
         'nautical_miles' => 3440.06479
     ];
 
+    private static $ADAPTER_CLASS = 'QueryAdapter';
+
+    private static $ADAPTER_NAMESPACE = 'QueryAdapters';
+
     public function getLatColumn()
     {
         return "{$this->getTable()}.{$this->latColumn}";
@@ -98,14 +102,14 @@ trait GeoDistanceTrait {
         $lng = ($lng === null) ? $this->lng() : $lng;
 
         $meanRadius = $this->resolveEarthMeanRadius($measurement);
-        $distance = floatval($distance);
+        $this->distance = $distance;
 
         // first-cut bounding box (in degrees)
-        $maxLat = floatval($lat) + rad2deg($distance/$meanRadius);
-        $minLat = floatval($lat) - rad2deg($distance/$meanRadius);
+        $maxLat = floatval($lat) + rad2deg($this->distance/$meanRadius);
+        $minLat = floatval($lat) - rad2deg($this->distance/$meanRadius);
         // compensate for degrees longitude getting smaller with increasing latitude
-        $maxLng = floatval($lng) + rad2deg($distance/$meanRadius/cos(deg2rad(floatval($lat))));
-        $minLng = floatval($lng) - rad2deg($distance/$meanRadius/cos(deg2rad(floatval($lat))));
+        $maxLng = floatval($lng) + rad2deg($this->distance/$meanRadius/cos(deg2rad(floatval($lat))));
+        $minLng = floatval($lng) - rad2deg($this->distance/$meanRadius/cos(deg2rad(floatval($lat))));
 
         $lat = $pdo->quote(floatval($lat));
         $lng = $pdo->quote(floatval($lng));
@@ -123,7 +127,7 @@ trait GeoDistanceTrait {
                     And $lngColumn Between $minLng And $maxLng
                 ) As {$this->getTable()}"
             ))
-            ->having('distance', '<=', $distance)
+            ->having('distance', '<=', $this->distance)
             ->orderby('distance', 'ASC');
     }
 
@@ -147,6 +151,23 @@ trait GeoDistanceTrait {
         return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
         ->having('distance', '>=', $distance)
         ->orderby('distance', 'ASC');
+    }
+
+    public function resolveQueryAdapter($connectionType)
+    {
+        $class = $this->buildFullyQualifiedClassString($connectionType);
+
+        if ( ! class_exists($class))
+        {
+            $class =  $this->buildFullyQualifiedClassString();
+        }
+
+        return new $class($this->getTable(), $this->getLatColumn(), $this->getLngColumn(), $this->distance);
+    }
+
+    private function buildFullyQualifiedClassString($connectionType = '')
+    {
+        return __NAMESPACE__.'\\'.self::$ADAPTER_NAMESPACE."\\{$connectionType}".self::$ADAPTER_CLASS;
     }
 
 }

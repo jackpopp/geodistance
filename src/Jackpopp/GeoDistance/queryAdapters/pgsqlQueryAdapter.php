@@ -1,4 +1,4 @@
-<?php
+<?php namespace Jackpopp\GeoDistance\QueryAdapters;
 
 /**
 * 
@@ -6,8 +6,13 @@
 class pgsqlQueryAdapter extends AbstractQueryAdapter
 {
 	
-	function __construct(argument)
+	function outside(Builder $query)
 	{
-		# code...
+
+	}
+
+	function within(Builder $query)
+	{
+		
 	}
 }
