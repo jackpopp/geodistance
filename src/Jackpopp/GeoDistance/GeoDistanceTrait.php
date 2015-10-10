@@ -124,7 +124,7 @@ trait GeoDistanceTrait {
                     ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
                     * cos( radians( $lngColumn ) - radians($lng) )
                     + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"
-        )->from(DB::raw(' ( ' . $dubQuery->toSql() . " ) AS $this->getTable()"))
+        )->from(DB::raw(' ( ' . $subQuery->toSql() . " ) AS $this->getTable()"))
         ->mergeBindings($subQuery)
         ->having('distance', '<=', $distance)
         ->orderby('distance', 'asc');
