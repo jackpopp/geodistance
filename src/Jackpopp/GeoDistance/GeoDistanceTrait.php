@@ -114,22 +114,21 @@ trait GeoDistanceTrait {
         // Paramater bindings havent been used as it would need to be within a DB::select which would run straight away and return its result, which we dont want as it will break the query builder.
         // This method should work okay as our values have been cooerced into correct types and quoted with pdo.
 
-        return $q->select(DB::raw("*"))
-            ->from(DB::raw(
-                "(
-                    select *,
-                        ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
-                        * cos( radians( $lngColumn ) - radians($lng) )
-                        + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance
-                    from (
-                        select *
-                        from {$this->getTable()}
-                        where $latColumn between $minLat and $maxLat
-                        and $lngColumn between $minLng and $maxLng
-                    ) AS {$this->getTable()}
-                ) sub"))
-            ->having('distance', '<=', $distance)
-            ->orderby('distance', 'ASC');
+        return $q->select(DB::raw("*
+            from (
+                select *,
+                    ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
+                    * cos( radians( $lngColumn ) - radians($lng) )
+                    + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance
+                from (
+                    select *
+                    from {$this->getTable()}
+                    where $latColumn between $minLat and $maxLat
+                    and $lngColumn between $minLng and $maxLng
+                ) AS {$this->getTable()}
+            ) sub
+            where distance <= $1
+            order by distance asc"));
     }
 
     public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)
