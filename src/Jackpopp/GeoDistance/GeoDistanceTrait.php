@@ -116,7 +116,7 @@ trait GeoDistanceTrait {
 
         $subQuery = DB::table($this->getTable())
             ->whereBetween($latColumn, [$minLat, $maxLat])
-            ->whereBetween($lngColumn, [$minLng, $maxLng])
+            ->whereBetween($lngColumn, [$minLng, $maxLng]);
 
         return $q->selectRaw("*
             from (
