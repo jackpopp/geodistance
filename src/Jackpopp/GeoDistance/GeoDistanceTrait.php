@@ -87,7 +87,7 @@ trait GeoDistanceTrait {
     * credit - https://developers.google.com/maps/articles/phpsqlsearch_v3
     **/
 
-    public function scopeWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
+    public function getWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
         $pdo = DB::connection()->getPdo();
 
@@ -114,18 +114,38 @@ trait GeoDistanceTrait {
         // Paramater bindings havent been used as it would need to be within a DB::select which would run straight away and return its result, which we dont want as it will break the query builder.
         // This method should work okay as our values have been cooerced into correct types and quoted with pdo.
 
-        $subQuery = DB::table($this->getTable())
-            ->whereBetween($latColumn, [$minLat, $maxLat])
-            ->whereBetween($lngColumn, [$minLng, $maxLng]);
-
-        return $q->selectRaw("*
+        /* We want this query:
+        select *
+        from (
+            select *,
+                (3959 * acos( cos( radians(53.49) ) * cos( radians( places.lat ) )
+                * cos( radians( places.lng ) - radians(-2.38) )
+                + sin( radians(53.49) ) * sin( radians( places.lat ) ) ) ) AS distance
             from (
-                select *,
-                    ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
-                    * cos( radians( $lngColumn ) - radians($lng) )
-                    + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"
-        )->from(DB::raw(' ( ' . $subQuery->toSql() . " ) AS $this->getTable()"))
-        ->mergeBindings($subQuery)
+                select *
+                from places
+                where places.lat between 53.475527714192 and 53.504472285808
+                and places.lng between -2.4043246788967 and -2.3556753211033
+                ) as places
+            where places.deleted_at is null
+            ) sub
+        where distance <= $1
+        order by distance asc
+        */
+
+        return DB::select(DB::raw("select *
+        from (
+            select *,
+                ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
+                * cos( radians( $lngColumn ) - radians(-2.38) )
+                + sin( radians(53.49) ) * sin( radians( places.lat ) ) ) ) as distance
+            from (
+                select *
+                from $this->getTable()
+                where $latColumn betweeb $minLat and $maxLat
+                where $lngColumn between $minLng and $maxLng
+                ) as $this->getTable()
+        "))
         ->having('distance', '<=', $distance)
         ->orderby('distance', 'asc');
     }
