@@ -126,7 +126,7 @@ trait GeoDistanceTrait {
                     + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"
         )->from(DB::raw(' ( ' . $dubQuery->toSql() . " ) AS $this->getTable()"))
         ->mergeBindings($subQuery)
-        ->having('distance' '<=' $distance)
+        ->having('distance', '<=', $distance)
         ->orderby('distance', 'asc');
     }
 
