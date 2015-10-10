@@ -121,7 +121,7 @@ trait GeoDistanceTrait {
                         ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
                         * cos( radians( $lngColumn ) - radians($lng) )
                         + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance
-                    (
+                    from (
                         select *
                         from {$this->getTable()}
                         where $latColumn between $minLat and $maxLat
