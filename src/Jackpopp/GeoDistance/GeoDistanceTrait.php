@@ -87,7 +87,7 @@ trait GeoDistanceTrait {
     * credit - https://developers.google.com/maps/articles/phpsqlsearch_v3
     **/
 
-    public function getWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
+    public function scopeWithin($q, $distance, $measurement = null, $lat = null, $lng = null)
     {
         $pdo = DB::connection()->getPdo();
 
