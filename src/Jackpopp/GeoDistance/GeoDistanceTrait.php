@@ -58,7 +58,7 @@ trait GeoDistanceTrait {
     *
     * Grabs the earths mean radius in a specific measurment based on the key provided, throws an exception
     * if no mean readius measurement is found
-    * 
+    *
     * @throws InvalidMeasurementException
     * @return float
     **/
@@ -114,17 +114,43 @@ trait GeoDistanceTrait {
         // Paramater bindings havent been used as it would need to be within a DB::select which would run straight away and return its result, which we dont want as it will break the query builder.
         // This method should work okay as our values have been cooerced into correct types and quoted with pdo.
 
-        return $q->select(DB::raw("*, ( $meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) ) * cos( radians( $lngColumn ) - radians($lng) ) + sin( radians($lat) ) * sin( radians( $latColumn ) ) ) ) AS distance"))
-            ->from(DB::raw(
-                "(
-                    Select *
-                    From {$this->getTable()}
-                    Where $latColumn Between $minLat And $maxLat
-                    And $lngColumn Between $minLng And $maxLng
-                ) As {$this->getTable()}"
-            ))
-            ->having('distance', '<=', $distance)
-            ->orderby('distance', 'ASC');
+        /* We want this query:
+        select *
+        from (
+            select *,
+                (3959 * acos( cos( radians(53.49) ) * cos( radians( places.lat ) )
+                * cos( radians( places.lng ) - radians(-2.38) )
+                + sin( radians(53.49) ) * sin( radians( places.lat ) ) ) ) AS distance
+            from (
+                select *
+                from places
+                where places.lat between 53.475527714192 and 53.504472285808
+                and places.lng between -2.4043246788967 and -2.3556753211033
+                ) as places
+            where places.deleted_at is null
+            ) sub
+        where distance <= $1
+        order by distance asc
+        */
+
+        $distanceQuery = DB::table(DB::raw("(
+            select *
+            from {$this->getTable()}
+            where $latColumn between $minLat and $maxLat
+            and $lngColumn between $minLng and $maxLng
+        ) as places"))
+            ->select(DB::raw("*,
+                (
+                    $meanRadius * acos(cos(radians($lat)) * cos (radians($latColumn))
+                    * cos (radians($lngColumn) - radians($lng))
+                    + sin(radians($lat)) * sin (radians($latColumn)))
+                ) as distance"))
+            ->toSql();
+
+        return DB::table(DB::raw('(' . $distanceQuery . ') as sub'))
+            ->select(DB::raw("*"))
+            ->where('distance', '<=', $distance)
+            ->orderBy('distance', 'asc');
     }
 
     public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)
