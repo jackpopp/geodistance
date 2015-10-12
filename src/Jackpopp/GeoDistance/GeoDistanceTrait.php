@@ -133,21 +133,24 @@ trait GeoDistanceTrait {
         order by distance asc
         */
 
-        return DB::select(DB::raw("select *
-        from (
-            select *,
-                ($meanRadius * acos( cos( radians($lat) ) * cos( radians( $latColumn ) )
-                * cos( radians( $lngColumn ) - radians(-2.38) )
-                + sin( radians(53.49) ) * sin( radians( places.lat ) ) ) ) as distance
-            from (
-                select *
-                from $this->getTable()
-                where $latColumn betweeb $minLat and $maxLat
-                where $lngColumn between $minLng and $maxLng
-                ) as $this->getTable()
-        "))
-        ->having('distance', '<=', $distance)
-        ->orderby('distance', 'asc');
+        $distanceQuery = DB::table(DB::raw("(
+            select *
+            from {$this->getTable()}
+            where $latColumn between $minLat and $maxLat
+            and $lngColumn between $minLng and $maxLng
+        ) as places"))
+            ->select(DB::raw("*,
+                (
+                    $meanRadius * acos(cos(radians($lat)) * cos (radians($latColumn))
+                    * cos (radians($lngColumn) - radians($lng))
+                    + sin(radians($lat)) * sin (radians($latColumn)))
+                ) as distance"))
+            ->toSql();
+
+        return DB::table(DB::raw('(' . $distanceQuery . ') as sub'))
+            ->select(DB::raw("*"))
+            ->where('distance', '<=', $distance)
+            ->orderBy('distance', 'asc');
     }
 
     public function scopeOutside($q, $distance, $measurement = null, $lat = null, $lng = null)
