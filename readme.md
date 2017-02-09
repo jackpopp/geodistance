@@ -68,7 +68,7 @@ Kilometers (kilometers/km)
 Nautical Miles (nautical_miles)
 Feet (feet)
 
-If you wish to add addtional measurements, please create a new issue.
+If you wish to add additional measurements, please create a new issue.
 
 
-Credit to movable-type.co.uk for information on selecting points withing a bounding circle - http://www.movable-type.co.uk/scripts/latlong-db.html
+Credit to movable-type.co.uk for information on selecting points within a bounding circle - http://www.movable-type.co.uk/scripts/latlong-db.html
