@@ -1,7 +1,7 @@
 # GeoDistance
 GeoDistance allows you to search for locations within a radius using latitude and longitude values with your eloquent models.
 
-###Setup
+### Setup
 
 Add geodistance to your composer file.
 ```
